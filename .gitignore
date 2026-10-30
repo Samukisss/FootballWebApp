@@ -1,0 +1,25 @@
+# Archivos temporales de DataFlex
+*.sws.lock
+*.tmp
+*.bak
+*.log
+
+# Archivos compilados
+*.exe
+*.dll
+*.obj
+*.pdb
+
+# Archivos de configuracion locales
+.env
+.env.*
+
+# Conexion local de DataFlex con MySQL
+Data/DfConnId.ini
+
+# Archivos locales y temporales de DataFlex
+IdeSrc/Workspace.loc
+*.sws.lock
+
+# Credenciales locales de MySQL
+Data/DfConnId.ini

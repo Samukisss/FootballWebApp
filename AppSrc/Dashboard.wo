@@ -1,0 +1,139 @@
+﻿
+Use cWebView.pkg
+Use cWebPanel.pkg
+Use cWebForm.pkg
+Use cWebButton.pkg
+Use cWebGroup.pkg
+Use cWebSpacer.pkg
+Use cWebHtmlBox.pkg
+Use cWebMenuGroup.pkg
+Use cWebMenuItem.pkg
+Use cWebLabel.pkg
+Use cWebList.pkg
+Use cWebColumn.pkg
+
+Object oDashboard is a cWebView
+
+    Set piMaxWidth to 1024
+
+    Set psCaption to "Dashboard"
+    Set peViewType to vtUndefined
+    Set pbShowCaption to False
+    Set psCSSClass to "Dashboard"
+
+    Object oWebMainPanel is a cWebPanel
+
+        Set piColumnCount to 24
+
+        WebSetResponsive piColumnCount rmMobile to 1
+        WebSetResponsive piColumnCount rmTabletPortrait to 16
+
+        Object oTiles_grp is a cWebGroup
+
+            Set piColumnSpan to 8
+            Set pbShowBorder to False
+            Set pbShowCaption to False
+            Set piColumnCount to 12
+
+            Set psCSSClass to "TilesGroup"
+
+            // TARJETA 1 - ENTRENADORES
+
+            Object oTileEntrenadores is a cWebHtmlBox
+
+                Set pbServerOnClick to True
+                Set piColumnSpan to 6
+                Set psCSSClass to "Tile Light"
+
+                Set psHtml to '<div class="WebCon_Sizer" data-ServerOnClick="openview"><div class="Tile_Title">Entrenadores</div><div class="Tile_Subtitle"></div></div>'
+
+                WebRegisterPath ntNavigateForwardCustom oSelectEntrenador
+
+                Procedure OnClick String sId String sParam
+                    Send NavigatePath
+                End_Procedure
+
+            End_Object
+
+            // TARJETA 2 - JUGADORES
+
+            Object oTileJugadores is a cWebHtmlBox
+
+                Set pbServerOnClick to True
+                Set piColumnSpan to 6
+                Set piColumnIndex to 6
+                Set psCSSClass to "Tile LightAlternate"
+
+                Set psHtml to '<div class="WebCon_Sizer" data-ServerOnClick="openview"><div class="Tile_Title">Jugadores</div><div class="Tile_Subtitle"></div></div>'
+
+                WebRegisterPath ntNavigateForwardCustom oSelectJugador
+
+                Procedure OnClick String sId String sParam
+                    Send NavigatePath
+                End_Procedure
+
+            End_Object
+
+            // TARJETA 3 - POSICIONES
+
+            Object oTilePosiciones is a cWebHtmlBox
+
+                Set pbServerOnClick to True
+                Set piColumnSpan to 6
+                Set psCSSClass to "Tile Dark"
+
+                Set psHtml to '<div class="WebCon_Sizer" data-ServerOnClick="openview"><div class="Tile_Title">Posiciones</div><div class="Tile_Subtitle"></div></div>'
+
+                WebRegisterPath ntNavigateForwardCustom oSelectPosicion
+
+                Procedure OnClick String sId String sParam
+                    Send NavigatePath
+                End_Procedure
+
+            End_Object
+
+            // TARJETA 4 - EQUIPOS
+
+            Object oTileEquipos is a cWebHtmlBox
+
+                Set pbServerOnClick to True
+                Set piColumnSpan to 6
+                Set piColumnIndex to 6
+                Set psCSSClass to "Tile DarkAlternate"
+
+                Set psHtml to '<div class="WebCon_Sizer" data-ServerOnClick="openview"><div class="Tile_Title">Equipos</div><div class="Tile_Subtitle"></div></div>'
+
+                WebRegisterPath ntNavigateForwardCustom oSelectEquipo
+
+                Procedure OnClick String sId String sParam
+                    Send NavigatePath
+                End_Procedure
+
+            End_Object
+
+            // TARJETA 5 - LIGAS
+
+            Object oTileLigas is a cWebHtmlBox
+
+                Set pbServerOnClick to True
+                Set piColumnSpan to 6
+                Set psCSSClass to "Tile Light"
+
+                Set psHtml to '<div class="WebCon_Sizer" data-ServerOnClick="openview"><div class="Tile_Title">Ligas</div><div class="Tile_Subtitle"></div></div>'
+
+                WebRegisterPath ntNavigateForwardCustom oSelectLiga
+
+                Procedure OnClick String sId String sParam
+                    Send NavigatePath
+                End_Procedure
+
+            End_Object
+
+        End_Object
+
+    End_Object
+
+    Procedure OnBeforeShow
+    End_Procedure
+
+End_Object

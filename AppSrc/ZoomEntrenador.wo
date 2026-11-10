@@ -1,7 +1,4 @@
-﻿// C:\DataFlex Projects\FutbolWebApp\AppSrc\ZoomEntrenador.wo
-// VistaZoomEntrenador
-//
-
+﻿
 Use cWebView.pkg
 Use cWebPanel.pkg
 Use cWebMenuGroup.pkg
@@ -13,6 +10,7 @@ Use cequipoDataDictionary.dd
 Use centrenadorDataDictionary.dd
 
 Object oZoomEntrenador is a cWebView
+
     Set piColumnCount to 12
     Set psCaption to "VistaZoomEntrenador"
     Set peWebViewStyle to wvsDrilldown
@@ -21,22 +19,27 @@ Object oZoomEntrenador is a cWebView
     Set Verify_Save_Msg to 0
     Set piMaxWidth to 1024
 
+    // ESTRUCTURA DE DATA DICTIONARIES
+
     Object oliga_DD is a cligaDataDictionary
-    End_Object 
+    End_Object
 
     Object oequipo_DD is a cequipoDataDictionary
-        Set DDO_Server To oliga_DD
-    End_Object 
+        Set DDO_Server to oliga_DD
+    End_Object
 
     Object oentrenador_DD is a centrenadorDataDictionary
-        Set DDO_Server To oequipo_DD
-    End_Object 
+        Set DDO_Server to oequipo_DD
+    End_Object
 
-    Set Main_DD To oentrenador_DD
-    Set Server  To oentrenador_DD
+    Set Main_DD to oentrenador_DD
+    Set Server to oentrenador_DD
 
+
+    // FORMULARIO DE ENTRENADOR
 
     Object oWebMainPanel is a cWebPanel
+
         Set piColumnCount to 12
         WebSetResponsive piColumnCount rmMobile to 4
 
@@ -46,7 +49,7 @@ Object oZoomEntrenador is a cWebView
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
             Set psLabel to "ID"
-        End_Object 
+        End_Object
 
         Object oentrenadorNombre is a cWebForm
             Entry_Item entrenador.Nombre
@@ -54,7 +57,7 @@ Object oZoomEntrenador is a cWebView
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
             Set psLabel to "Nombre"
-        End_Object 
+        End_Object
 
         Object oentrenadorApellido is a cWebForm
             Entry_Item entrenador.Apellido
@@ -62,7 +65,7 @@ Object oZoomEntrenador is a cWebView
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
             Set psLabel to "Apellido"
-        End_Object 
+        End_Object
 
         Object oentrenadorNacionalidad is a cWebForm
             Entry_Item entrenador.Nacionalidad
@@ -70,7 +73,10 @@ Object oZoomEntrenador is a cWebView
             Set piColumnIndex to 0
             Set peLabelPosition to lpTop
             Set psLabel to "Nacionalidad"
-        End_Object 
+        End_Object
+
+        // SPRINT 2 - PUNTO 2
+        // NAVEGACION FROM CHILD HACIA SELECT EQUIPO
 
         Object oequipoID is a cWebForm
             Entry_Item equipo.ID
@@ -80,14 +86,18 @@ Object oZoomEntrenador is a cWebView
             Set psLabel to "Equipo"
             Set pbPromptButton to True
 
-// ToDo: Fill in the from-child parent Select view object name for navigate forward
-//            WebRegisterPath ntNavigateForward oSelectView
+            WebRegisterPath ntNavigateForward oSelectEquipo
 
             Procedure OnPrompt
                 Send NavigatePath
             End_Procedure
-        End_Object 
-    End_Object 
+
+        End_Object
+
+    End_Object
+
+
+    // BOTONES DE ACCION
 
     Object oActionGroup is a cWebMenuGroup
 
@@ -98,18 +108,17 @@ Object oZoomEntrenador is a cWebView
             Procedure OnClick
                 Send Request_Save
             End_Procedure
-
-        End_Object 
+        End_Object
 
         Object oEditBtn is a cWebMenuItem
             Set psCSSClass to "WebEditMenuItem"
             Set psCaption to "Edit"
+
             Procedure OnClick
                 Send ChangeEditMode True
                 Send SetActionButtons
             End_Procedure
-
-        End_Object 
+        End_Object
 
         Object oDeleteBtn is a cWebMenuItem
             Set psCSSClass to "WebDeleteMenuItem"
@@ -119,21 +128,25 @@ Object oZoomEntrenador is a cWebView
             Procedure OnClick
                 Send Request_Delete
             End_Procedure
-
-        End_Object 
+        End_Object
 
         Object oCancelChangesBtn is a cWebMenuItem
             Set psCSSClass to "WebIcon_Refresh"
             Set psCaption to "Clear Changes"
             Set peActionDisplay to adMenu
+
             Procedure OnClick
                 Send RefreshRecord
             End_Procedure
+        End_Object
 
-        End_Object 
-    End_Object 
+    End_Object
+
+
+    // CONFIGURACION DE LOS BOTONES
 
     Procedure SetActionButtons
+
         tWebNavigateData NavigateData
         Boolean bHasRecord
         Handle hoDD
@@ -142,7 +155,6 @@ Object oZoomEntrenador is a cWebView
         Get GetNavigateData to NavigateData
         Get HasRecord of hoDD to bHasRecord
 
-        // let's hide all buttons and then Show the ones we want
         WebSet pbRender of oEditBtn to False
         WebSet pbRender of oSaveBtn to False
         WebSet pbRender of oCancelChangesBtn to False
@@ -156,33 +168,66 @@ Object oZoomEntrenador is a cWebView
             WebSet pbRender of oCancelChangesBtn to True
             WebSet pbRender of oDeleteBtn to bHasRecord
         End
+
     End_Procedure
 
+
+    // CERRAR DESPUES DE GUARDAR
+
     Procedure OnViewSaved Handle hoServer Boolean bChanged
-        // Close after save
         Send NavigateClose Self
     End_Procedure
 
-    // this will close the view after a delete
+
+    // CERRAR DESPUES DE ELIMINAR
+
     Procedure OnViewDeleted Handle hoDDO
         Send NavigateClose Self
     End_Procedure
 
+
+    // SPRINT 2 - PUNTO 1
+    // COMPROBACION DE LA NAVEGACION FROM MAIN
+
     Procedure OnNavigateForward tWebNavigateData NavigateData Integer hoInvokingView Integer hoInvokingObject
+
+        String sInvokingView
+        String sInvokingObject
+        String sMensaje
+
+        If (hoInvokingView <> 0) Begin
+            Get Name of hoInvokingView to sInvokingView
+        End
+        Else Begin
+            Move "Ninguna" to sInvokingView
+        End
+
+        If (hoInvokingObject <> 0) Begin
+            Get Name of hoInvokingObject to sInvokingObject
+        End
+        Else Begin
+            Move "Desconocido" to sInvokingObject
+        End
+
         Case Begin
+
             Case (NavigateData.eNavigateType = nfFromMain)
-                // If from main, this is a propbably a main file Select to Zoom.
+
+                Move ("InvokingView: " + sInvokingView + ;
+                      " | InvokingObject: " + sInvokingObject) to sMensaje
+
+                Send ShowInfoBox sMensaje "Navegacion From Main"
+
                 Case Break
 
             Case (NavigateData.eNavigateType = nfFromParent)
-                // If from parent, this is a constrained drill down.
                 Case Break
 
             Case (NavigateData.eNavigateType = nfFromChild)
-                // If from child, this is a probably a parent Zoom from a Zoom.
                 Case Break
 
-            Case Else // must be nfUndefined
+            Case Else
+                // Navegacion sin tipo definido.
 
         Case End
 
@@ -190,4 +235,4 @@ Object oZoomEntrenador is a cWebView
 
     End_Procedure
 
-End_Object 
+End_Object

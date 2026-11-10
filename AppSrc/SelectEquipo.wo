@@ -8,11 +8,20 @@ Use cWebMenuGroup.pkg
 Use cWebMenuItem.pkg
 Use cWebForm.pkg
 Use cWebColumnButton.pkg
+
+Use cligaDataDictionary.dd
 Use cequipoDataDictionary.dd
 
 Object oSelectEquipo is a cWebView
 
+    // DATA DICTIONARIES
+    // Relacion padre (Liga) - hijo (Equipo)
+
+    Object oliga_DD is a cligaDataDictionary
+    End_Object
+
     Object oEquipo_DD is a cequipoDataDictionary
+        Set DDO_Server to oliga_DD
     End_Object
 
     Set Main_DD to oEquipo_DD
@@ -28,6 +37,9 @@ Object oSelectEquipo is a cWebView
 
     WebSetResponsive piColumnCount rmTabletPortrait to 3
 
+
+    // LISTADO DE EQUIPOS
+
     Object oList is a cWebList
 
         Set pbFillHeight to True
@@ -39,12 +51,20 @@ Object oSelectEquipo is a cWebView
 
         WebRegisterPath ntNavigateForward oZoomEquipo
 
+
+        // NOMBRE DEL EQUIPO
+
         Object oColumn is a cWebColumn
+
             Entry_Item equipo.Nombre
             Set psCaption to "Nombre"
             Set psCSSClass to "RowCaption"
             Set peAlign to alignLeft
+
         End_Object
+
+
+        // BOTON DE INFORMACION
 
         Object oDetailButton is a cWebColumnButton
 
@@ -68,12 +88,20 @@ Object oSelectEquipo is a cWebView
 
         End_Object
 
+
+        // LIGA DEL EQUIPO
+
         Object oColumn2 is a cWebColumn
+
             Entry_Item equipo.LigaID
             Set psCaption to "Liga"
             Set pbNewLine to True
             Set psCSSClass to "RowDetail"
+
         End_Object
+
+
+        // NAVEGACION AL SELECCIONAR UN EQUIPO
 
         Procedure OnRowClick String sRowID
 
@@ -83,13 +111,28 @@ Object oSelectEquipo is a cWebView
 
             Case Begin
 
-                Case (NavigateData.eNavigateType=nfFromChild)
+                // Desde ZoomEntrenador:
+                // Elegir un equipo y regresar al entrenador.
+
+                Case (NavigateData.eNavigateType = nfFromChild)
                     Send NavigateClose Self
                     Case Break
 
-                Case (NavigateData.eNavigateType=nfFromMain)
+                // Desde ZoomLiga:
+                // Mostrar los equipos de la liga seleccionada
+                // y permitir abrir el Zoom del equipo.
+
+                Case (NavigateData.eNavigateType = nfFromParent)
+                    Send NavigateForward of oZoomEquipo Self
+                    Case Break
+
+                // Navegacion desde otra vista principal.
+
+                Case (NavigateData.eNavigateType = nfFromMain)
                     Send NavigateClose Self
                     Case Break
+
+                // Acceso desde el Dashboard.
 
                 Case Else
                     Send NavigateForward of oZoomEquipo Self
@@ -98,15 +141,22 @@ Object oSelectEquipo is a cWebView
 
         End_Procedure
 
+
         Procedure OnGetNavigateForwardData tWebNavigateData ByRef NavigateData Handle hoToView
             Move True to NavigateData.bReadOnly
         End_Procedure
 
     End_Object
 
+
+    // MENU DE ACCIONES
+
     Object oActionGroup is a cWebMenuGroup
 
         Set psGroupName to "MainActions"
+
+
+        // BUSQUEDA
 
         Object oSearch is a cWebMenuItem
 
@@ -118,6 +168,9 @@ Object oSelectEquipo is a cWebView
             End_Procedure
 
         End_Object
+
+
+        // NUEVO EQUIPO
 
         Object oNewButton is a cWebMenuItem
 
@@ -136,6 +189,9 @@ Object oSelectEquipo is a cWebView
 
         End_Object
 
+
+        // PRIMER REGISTRO
+
         Object oFindTop is a cWebMenuItem
 
             Set psCaption to C_$Top
@@ -147,6 +203,9 @@ Object oSelectEquipo is a cWebView
             End_Procedure
 
         End_Object
+
+
+        // ULTIMO REGISTRO
 
         Object oFindLast is a cWebMenuItem
 
@@ -161,8 +220,13 @@ Object oSelectEquipo is a cWebView
 
     End_Object
 
+
+    // CONTROL DE NAVEGACION
+
     Procedure OnNavigateForward tWebNavigateData NavigateData Integer hoInvokingView Integer hoInvokingObject
+
         Forward Send OnNavigateForward NavigateData hoInvokingView hoInvokingObject
+
     End_Procedure
 
 End_Object
